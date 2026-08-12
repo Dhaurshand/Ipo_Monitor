@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // One document per signed-in user holds that user's whole tracker
+    // (IPOs, accounts, applications). Nobody can read or write another
+    // user's document, and unauthenticated requests are rejected.
+    match /ipoMonitor/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
